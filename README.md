@@ -1,4 +1,3 @@
-# zfs-utilities
-Sample tools for ZFS storage management
+# CLI tools for CloudByte storage management
 
-These scripts were developed while working on CloudByte ElastiStor, which uses a modified version of ZFS.
+The scripts can be copied over to the cloudbyte elastistor nodes and run an individual cli commands. 
