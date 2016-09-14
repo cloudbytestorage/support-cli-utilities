@@ -54,9 +54,10 @@ do
   if [ $? -eq 0 ] ; then
     volname=`echo $vol | awk -F '/' '{print $3}'`
     echo "Gathering stats for $volname"
-    pr=`reng stats access dataset $vol qos | grep "Reads" | grep -v "Meta\|Disk" | awk '{print $2}'`
-    pw=`reng stats access dataset $vol qos | grep "Writes" | grep -v "Meta\|Disk" | awk '{print $2}'`
-    ps=`reng stats access dataset $vol qos | grep "IO staggered" | awk '{print $3}'`
+    reng stats access dataset $vol qos > "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname"
+    pr=`grep "Reads" "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $2}'`
+    pw=`grep "Writes" "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $2}'`
+    ps=`grep "IO staggered" "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | awk '{print $3}'`
     echo "$volname prev $pr $pw $ps" >> "${CWD}/$BACKUP_DIR/reng.stats"
   fi
 done
@@ -70,9 +71,10 @@ do
   if [ $? -eq 0 ] ; then
     echo "Gathering stats for $volname"
     volname=`echo $vol | awk -F '/' '{print $3}'`
-    cr=`reng stats access dataset $vol qos | grep "Reads" | grep -v "Meta\|Disk" | awk '{print $2}'`
-    cw=`reng stats access dataset $vol qos | grep "Writes" | grep -v "Meta\|Disk" | awk '{print $2}'`
-    cs=`reng stats access dataset $vol qos | grep "IO staggered" | awk '{print $3}'`
+    reng stats access dataset $vol qos > "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname"
+    cr=`grep "Reads"  "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $2}'`
+    cw=`grep "Writes"  "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $2}'`
+    cs=`grep "IO staggered"  "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | awk '{print $3}'`
     echo "$volname curr $cr $cw $cs" >> "${CWD}/$BACKUP_DIR/reng.stats"
   fi
 done
