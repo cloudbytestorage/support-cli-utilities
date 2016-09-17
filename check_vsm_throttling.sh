@@ -95,7 +95,7 @@ do
     cs=`grep "$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $5}'`
     tr=`echo $cr - $pr | bc`
     tw=`echo $cw - $pw | bc`
-    ts=`echo $cw - $pw | bc`
+    ts=`echo $cs - $ps | bc`
     echo "$volname diff $tr $tw $ts" >> "${CWD}/$BACKUP_DIR/reng.stats"
     echo "$volname $tr $tw $ts" 
   fi
