@@ -1,6 +1,6 @@
-# CLI tools for CloudByte storage management
+# Cli Utilities for CloudByte ElastiStor 
 
-TBD
+These are a bunch of scripts, each of which can be executed independently and will help the administrators perform management or support tasks on the CloudByte ElastiStor. 
 
 ## Install by Downloading from browser
 
