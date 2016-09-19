@@ -49,6 +49,9 @@ do
     prb=`grep "Read Size"  "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $3}'`
     pwb=`grep "Write Size"  "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $3}'`
     ps=`grep "IO staggered" "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | awk '{print $3}'`
+    pmr=`grep "Metadata Reads" "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | awk '{print $3}'`
+    pmw=`grep "Metadata Writes" "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | awk '{print $3}'`
+    pd=`grep "Remove Count" "${CWD}/$BACKUP_DIR/prev.reng.stats.$volname" | awk '{print $3}'`    
     echo "$volname prev $pr $pw $prb $pwb $ps" >> "${CWD}/$BACKUP_DIR/reng.stats"
   fi
 done
@@ -68,13 +71,16 @@ do
     crb=`grep "Read Size"  "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $3}'`
     cwb=`grep "Write Size"  "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | grep -v "Meta\|Disk" | awk '{print $3}'`
     cs=`grep "IO staggered"  "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | awk '{print $3}'`
+    cmr=`grep "Metadata Reads" "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | awk '{print $3}'`
+    cmw=`grep "Metadata Writes" "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | awk '{print $3}'`
+    cd=`grep "Remove Count" "${CWD}/$BACKUP_DIR/curr.reng.stats.$volname" | awk '{print $3}'`
     echo "$volname curr $cr $cw $crb $cwb $cs" >> "${CWD}/$BACKUP_DIR/reng.stats"
   fi
 done
 
 
 #Check for the difference between the current and previous values
-echo "Name Reads Writes RBytes WBytes Staggered"
+echo "Name Reads Writes RBytes WBytes Staggered MetaReads MetaWrites Deletes"
 for vol in $volumes
 do
   isvol=`echo $vol | egrep $volregexp`
@@ -85,19 +91,28 @@ do
     prb=`grep "^$volname prev" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $5}'`
     pwb=`grep "^$volname prev" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $6}'`
     ps=`grep "^$volname prev" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $7}'`
+    pmr=`grep "^$volname prev" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $8}'`
+    pmw=`grep "^$volname prev" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $9}'`
+    pd=`grep "^$volname prev" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $10}'`
 
     cr=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $3}'`
     cw=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $4}'`
     crb=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $5}'`
     cwb=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $6}'`
     cs=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $7}'`
+    cmr=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $8}'`
+    cmw=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $9}'`
+    cd=`grep "^$volname curr" ${CWD}/$BACKUP_DIR/reng.stats | awk '{print $10}'`
 
     tr=`echo $cr - $pr | bc`
     tw=`echo $cw - $pw | bc`
     trb=`echo $crb - $prb | bc`
     twb=`echo $cwb - $pwb | bc`
     ts=`echo $cs - $ps | bc`
-    echo "$volname diff $tr $tw $trb $twb $ts" >> "${CWD}/$BACKUP_DIR/reng.stats"
-    echo "$volname $tr $tw $trb $twb $ts" 
+    tmr=`echo $cmr - $pmr | bc`
+    tmw=`echo $cmw - $pmw | bc`
+    td=`echo $cd - $pd | bc`
+    echo "$volname diff $tr $tw $trb $twb $ts $tmr $tmw $td" >> "${CWD}/$BACKUP_DIR/reng.stats"
+    echo "$volname $tr $tw $trb $twb $ts $tmr $tmw $td" 
   fi
 done
