@@ -1,0 +1,28 @@
+#!/bin/sh
+#usage= {sh vsm_health_check.sh <vsmip>}
+RED='\033[0;31m'
+NC='\033[0m'
+jip="$1"
+echo -e "${RED}Jail IP:${NC}$jip\n"
+jlsid="$(jls | grep "$jip"|awk '{printf "%s", $1}')"
+echo -e "${RED}Jail Id:${NC}$jlsid\n"
+echo -e "${RED}Services running under this VSM are:${NC}\n"
+jlsmountd="$(jexec "$jlsid" service mountd onestatus)"
+echo -e "$jlsmountd\n"
+jlsnfsd="$(jexec "$jlsid" service nfsd onestatus)"
+echo -e "$jlsnfsd\n"
+jlsstad="$(jexec "$jlsid" service statd onestatus)"
+echo -e "$jlsstad\n"
+jlslockd="$(jexec "$jlsid" service lockd onestatus)"
+echo -e "$jlslockd\n"
+jlsrpcbind="$(jexec "$jlsid" service rpcbind onestatus)"
+echo -e "$jlsrpcbind\n"
+echo -e "${RED}Export File:${NC}\n"
+jlsexport="$(jexec  $jlsid cat /etc/export)"
+echo -e "$jlsexport\n"
+echo -e "${RED}zfs list of this  VSM are:${NC}\n"
+jexeccmd="$(jexec $jlsid zfs list|grep -v tpool)"
+echo "$jexeccmd\n"
+echo -e "${RED}Clients connected to this VSM are :${NC}\n"
+jlsnetstat="$(jexec "$jlsid" netstat -an | grep -i est | grep "3260\|2049\|445")"
+echo "$jlsnetstat"
