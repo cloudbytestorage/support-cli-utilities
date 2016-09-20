@@ -27,6 +27,6 @@ echo -e "${RED}istgt details${NC}\n"
 jlsistgt="$(jexec $jlsid istgtcontrol dump)"
 echo -e "$jlsistgt\n"
 echo -e "${RED}Clients connected to this VSM are :${NC}\n"
-jlsnetstat="$(jexec "$jlsid" netstat -an | grep -i est | grep "3260\|2049\|440")"
+jlsnetstat="$(jexec "$jlsid" netstat -an | grep -i est | grep "3260\|2049\|445")"
 echo "$jlsnetstat"
 
