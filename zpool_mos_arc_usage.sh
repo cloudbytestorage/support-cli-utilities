@@ -9,7 +9,7 @@ if [ $# -gt 0 ] ; then
   duration=$1
 fi
 
-pools=`zpool list | grep -v "NAME" | awk '{print $1}' | xargs`
+pools=`zpool list | grep -v "NAME\|tpool" | awk '{print $1}' | xargs`
 for pool in $pools
 do
   echo "POOL: $pool"
@@ -17,17 +17,21 @@ do
 
   pused=`sysctl kstat.zfs.mos_${pool}.arcstats.size | awk '{print $2}'`
   pmisses=`sysctl kstat.zfs.mos_${pool}.arcstats.misses | awk '{print $2}'`
+  phits=`sysctl kstat.zfs.mos_${pool}.arcstats.hits | awk '{print $2}'`
   sleep $duration
   cused=`sysctl kstat.zfs.mos_${pool}.arcstats.size | awk '{print $2}'`
   cmisses=`sysctl kstat.zfs.mos_${pool}.arcstats.misses | awk '{print $2}'`
+  chits=`sysctl kstat.zfs.mos_${pool}.arcstats.hits | awk '{print $2}'`
 
   pct_used_dec=`echo $pused / $c_max | bc -l`
   pct_used=`echo $pct_used_dec \* 100 | bc -l`
   pct_used_rnd=`printf %.2f "$pct_used"`
 
   missed=`echo $cmisses - $pmisses | bc -l`
+  hits=`echo $chits - $phits | bc -l`
 
   echo "  Arc Limit  : $c_max"
   echo "  Arc Used   : $pct_used_rnd"
   echo "  Arc Missed : $missed"
+  echo "  Arc Hits   : $hits"
 done
