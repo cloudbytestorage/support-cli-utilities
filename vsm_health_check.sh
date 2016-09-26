@@ -1,6 +1,12 @@
 #!/bin/sh
 ## This script gets detail about VSM health
 #usage= {sh vsm_health_check.sh <vsmip>}
+if [ $# -lt 1 ]
+then
+ echo "Enter the VSM IP";
+ echo "Usage:sh vsm_health_check.sh <vsmip>"
+ exit;
+fi
 timestamp=$(date +"%d-%m-%Y")
 FILE=/root/"VSM_Health_$timestamp"
 mkdir -p $FILE
