@@ -21,7 +21,7 @@ jip="$1"
 echo -e "${RED}Jail IP:${NC}$jip\n"
 
 jlsipbind=`/sbin/ifconfig |grep -c "$jip"`
-/sbin/ifconfig | grep -B 3 "$jip" > jlsifconfig.out
+/sbin/ifconfig | grep -B 3 "$jip" > jlsifconfig_$jip.out
 if [ $jlsipbind -eq 0 ]
 then
  echo -e "$jip is not binded\n"
@@ -38,8 +38,8 @@ jexeccmd="$(jexec $jlsid zfs list|grep -v tpool)"
 echo -e "$jexeccmd\n"
 
 echo -e "${BLUE}NFS Details${NC}\n"
-jlsexport="$(jexec  $jlsid cat /etc/export)" 
-echo "$jlsexport" > export.out  2>&1
+jlsexport="$(jexec  $jlsid cat /etc/export)"
+echo "$jlsexport" > export_$jip.out  2>&1
 echo -e "${CYAN}Services running status:${NC}\n"
 jlslockd="$(jexec $jlsid service lockd onestatus)"
 jlsmountd="$(jexec $jlsid service mountd onestatus)"
@@ -54,6 +54,6 @@ jlsiscsi="$(jexec $jlsid service istgt onestatus)"
 echo -e "$jlsiscsi\n"
 
 jlsistgt="$(jexec $jlsid istgtcontrol dump)"
-echo  "$jlsistgt" > istgtcontrol_dump.out
+echo  "$jlsistgt" > istgtcontrol_dump_$jip.out
 jlsnetstat="$(jexec "$jlsid" netstat -an | grep -i est | grep "3260\|2049\|445")"
-echo "$jlsnetstat" > clientconnected.out
+echo "$jlsnetstat" > clientconnected_$jip.out
