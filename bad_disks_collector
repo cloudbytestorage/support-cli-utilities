@@ -1,0 +1,99 @@
+#!/bin/sh
+pgrep "zpool|zfs|gmultipath"
+if [ $? -eq 0 ]
+then
+ count=1
+ while [ $count -lt 31 ]
+ do
+  echo $count
+  sleep 1
+  pgrep "zpool|zfs|gmultipath"
+  if [ $? -ne 0 ]
+  then
+    break
+  fi
+  count=`expr $count + 1`
+  if [ $count -eq 31 ]
+  then
+    echo "Cannot execute this script zfs or gmultipath command is in execution"
+    echo "Try after some time"
+	exit
+  fi
+ done
+fi
+timestamp=$(date +"%d-%m-%Y")
+FILE=/root/"baddisk_$timestamp"
+mkdir -p $FILE
+echo "File created"
+cd $FILE
+rm  File File1 File2 File3 Filee3 File4
+echo "Executing zpool status............."
+zpool status > $FILE/zpoolstatus.out
+echo "done"
+#sed  '/FAULTED\|BROKEN/d'  $FILE/zpoolstatus.out > File
+#sed  '/ONLINE/!d'  $FILE/zpoolstatus.out > File
+sed  '/FAULTED/!d'  $FILE/zpoolstatus.out >> File
+sed  '/BROKEN/!d'  $FILE/zpoolstatus.out >> File
+grep -i multipath File > File1
+awk '{$1=$1}{ print }' File1 > File2
+da="$(awk '{print $1}' File2)"
+echo "$da" > File2
+while read line; 
+do
+ cmd='gmultipath status| grep -i '${line}''
+ #echo "${line}"
+ #echo "$cmd"
+ eval "$cmd" >> File3
+done < File2
+sed  '/DEGRADED/!d' File3 >Filee3
+if grep -i "Degraded" Filee3 
+ then 
+  grep -o "da." Filee3 >File4
+  #dacnt="$(grep -i  Degraded Filee3 | wc -l)"
+  if grep -o "da." File4
+  then
+   while read line
+   do
+    echo "Bad disk Multipath:"$line
+    danum="$line"
+    echo "Executing smartctl -x -T permissive /dev/"$danum
+    echo $'\n'$'smartctl -x -T permissive /dev/'$danum$'\n' >> smart_$danum.out
+    smartctl -x -T permissive /dev/$danum >>  smart_$danum.out 2>&1
+    echo "done"
+
+    echo "Executing sg_inq /dev/"$danum
+    echo $'\n'$'sg_logs -p 0x05 /dev/'$danum$'\n' >> smart_$danum.out
+    sg_inq -s /dev/$danum >> smart_$danum.out 2>&1
+    echo "done"
+
+    echo "Executing smartctl -a -T permissive /dev/"$danum
+    echo $'\n'$'smartctl -a -T permissive /dev/'$danum$'\n' >> smart_$danum.out
+    smartctl -a -T permissive /dev/$danum >>  smart_$danum.out 2>&1
+    echo "done"
+
+    echo "Executing sg_logs -p 0x05 /dev/"$danum
+    echo $'\n'$'sg_logs -p 0x05 /dev/'$danum$'\n' >> smart_$danum.out
+    sg_logs -p 0x05 /dev/$danum >> smart_$danum.out 2>&1
+    echo "done"
+
+    echo "Executing sg_readcap /dev/"$danum
+    echo $'\n'$'sg_readcap /dev/'$danum$'\n' >> smart_$danum.out
+    sg_readcap /dev/$danum >>smart_$danum.out 2>&1
+    echo "done"
+
+    echo "Executing sg_persist /dev/"$danum
+    echo $'\n'$'sg_persist /dev/'$danum$'\n' >> smart_$danum.out
+    sg_persist /dev/$danum >>  smart_$danum.out 2>&1
+    echo "done"
+
+    echo "Executing camcontrol modepage" $danum "-m 1"
+    camcontrol modepage $danum -m 1 > camcontrol_$danum.out 2>&1 
+    rm File File1 File2 File3 Filee3 File4 
+    echo "success"
+    echo "Files are located at "$FILE
+   done < File4
+  fi
+ else
+  echo "All Disks are in good status"
+  rm  File File1 File2 File3 Filee3 File4
+fi
