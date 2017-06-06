@@ -1,6 +1,6 @@
 #!/bin/sh
 ##This script will check IP are assign after HA 
-#Usages:sh ip_ha.sh <giveback/takeover>
+#Usages:sh checkip_ha.sh <giveback/takeover>
 if [ $# -lt 1 ]
 then
  echo "Usages: $0 <giveback/takeover>"
